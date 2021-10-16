@@ -35,17 +35,3 @@ fn cant_save_logs_with_identical_hashes_test() {
         assert_noop!(Auditor::save_audit_log(second_sender, second_content_hash, second_timestamp), Error::<Test>::AuditLogIdAlreadyExists);
 	});
 }
-
-/*
-fn create_hash_data(data: &u32) -> <Test as frame_system::Config>::Hash {
-    data.using_encoded(<Test as frame_system::Config>::Hash::zero())
-}*/
-
-/*
-#[test]
-fn correct_error_for_none_value() {
-	new_test_ext().execute_with(|| {
-		// Ensure the expected error is thrown when no value is present.
-		assert_noop!(TemplateModule::cause_error(Origin::signed(1)), Error::<Test>::NoneValue);
-	});
-}*/

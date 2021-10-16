@@ -26,7 +26,6 @@ pub mod pallet {
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
-        // type AugitLogReporterOrigin: EnsureOrigin<Self::Origin, Success = Self::AccountId>;
 	}
 
     #[pallet::pallet]
@@ -35,7 +34,6 @@ pub mod pallet {
 
     #[derive(Encode, Decode, Clone, Default, Eq, PartialEq, Debug, TypeInfo)]
     pub struct AuditLog<AccountId> {
-    //pub struct AuditLog {
         // Change the timestamp to a timestamp type handled by Substrate itself
         // Reporter determines which system sent the log
         timestamp: Vec<u8>,
@@ -51,11 +49,6 @@ pub mod pallet {
             self.reporter
         }
     }
-
-    /*
-    impl codec::EncodeLike<<T as frame_system::Config>::AccountId> for AuditLog<<T as frame_system::Config>::AccountId> {
-
-    }*/
 
     // Daily timestamps of a log file will be stored in the blockchain for consensus
     pub type AuditLogTimestamp = Vec<u8>;
