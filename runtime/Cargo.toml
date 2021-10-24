@@ -22,6 +22,9 @@ default-features = false
 path = '../pallets/auditor'
 version = '3.0.0-monthly-2021-10'
 
+[dependencies.auditor-rpc]
+path = "../pallets/auditor/auditor-rpc"
+
 [build-dependencies.substrate-wasm-builder]
 git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-10'
