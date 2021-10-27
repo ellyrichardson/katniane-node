@@ -5,7 +5,7 @@ sp_api::decl_runtime_apis! {
     pub trait AuditorApi<Hash> where
 		Hash: codec::Codec, {
 		/// save audit record
-        fn save_audit_record(content: Hash, timestamp: String) -> bool;
+        fn save_audit_record(accountId: AccountId, content: Hash, timestamp: String) -> DispatchResult;
         fn retrieve_audit_record(content: Hash) -> bool;
     }
 }

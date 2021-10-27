@@ -45,6 +45,8 @@ pub use pallet_template;
 
 pub use auditor_pallet;
 
+pub use auditor_runtime_api;
+
 /// An index to a block.
 pub type BlockNumber = u32;
 
@@ -343,6 +345,16 @@ impl_runtime_apis! {
 
 		fn initialize_block(header: &<Block as BlockT>::Header) {
 			Executive::initialize_block(header)
+		}
+	}
+	
+	impl auditor_runtime_api::AuditorApi<Hash> for Runtime {
+		fn save_audit_record(accountId: AccountId, content: Hash, timestamp: String) -> DispatchResult {
+			Auditor::save_audit_log(accountId, content, timestamp)
+		}
+
+        fn retrieve_audit_record(content: Hash) -> bool {
+			true
 		}
 	}
 
