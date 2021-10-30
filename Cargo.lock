@@ -372,11 +372,6 @@ dependencies = [
 [[package]]
 name = "auditor-pallet-runtime-api"
 version = "0.0.1-monthly-2021-10"
-dependencies = [
- "parity-scale-codec",
- "sp-api",
- "sp-runtime",
-]
 
 [[package]]
 name = "auditor-rpc"
@@ -3578,7 +3573,6 @@ name = "node-template-runtime"
 version = "3.0.0-monthly-2021-10"
 dependencies = [
  "auditor-pallet",
- "auditor-pallet-runtime-api",
  "auditor-rpc",
  "frame-benchmarking",
  "frame-executive",
