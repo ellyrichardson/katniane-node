@@ -9,6 +9,7 @@ edition = "2018"
 jsonrpc-derive = "18.0.0"
 jsonrpc-core = "18.0.0"
 jsonrpc-core-client = "18.0.0"
+#substrate-api-client = { git = "https://github.com/scs/substrate-api-client.git" }
 
 [dependencies.auditor-pallet]
 default-features = false
@@ -21,7 +22,7 @@ features = ['derive']
 package = 'parity-scale-codec'
 version = '2.0.0'
 
-[dependencies.substrate-api-client]
-git = "https://github.com/scs/substrate-api-client.git"
-version = '0.6.0'
-tag = 'monthly-2021-10'
+#[dependencies.substrate-api-client]
+#git = "https://github.com/scs/substrate-api-client.git"
+#version = '0.6.0'
+#tag = 'monthly-2021-10'

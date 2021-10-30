@@ -7,7 +7,7 @@ homepage = 'https://substrate.dev'
 edition = '2018'
 license = 'Unlicense'
 publish = false
-repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
+#repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
 build = 'build.rs'
 
 [[bin]]

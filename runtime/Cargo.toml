@@ -25,6 +25,11 @@ version = '3.0.0-monthly-2021-10'
 [dependencies.auditor-rpc]
 path = "../pallets/auditor/auditor-rpc"
 
+#[dependencies.auditor-pallet-runtime-api]
+#default-features = false
+#path = "../runtime-api"
+#version = '0.0.1-monthly-2021-10'
+
 [build-dependencies.substrate-wasm-builder]
 git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-10'
@@ -197,6 +202,9 @@ git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-10'
 version = '4.0.0-dev'
 
+#[dependencies]
+#getrandom = { version = "0.2", features = ["js"] }
+
 [features]
 default = ['std']
 runtime-benchmarks = [
@@ -237,4 +245,5 @@ std = [
     'sp-std/std',
     'sp-transaction-pool/std',
     'sp-version/std',
+    #'auditor-pallet-runtime-api/std',
 ]

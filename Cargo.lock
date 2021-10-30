@@ -370,6 +370,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "auditor-pallet-runtime-api"
+version = "0.0.1-monthly-2021-10"
+
+[[package]]
 name = "auditor-rpc"
 version = "0.1.0"
 dependencies = [
