@@ -348,7 +348,6 @@ impl_runtime_apis! {
 		}
 	}
 	
-	/*
 	impl auditor_pallet_runtime_api::AuditorApi<Hash> for Runtime {
 		fn save_audit_record(account_id: Hash, content: Hash, timestamp: String) -> bool {
 			Auditor::save_audit_log(account_id, content, timestamp)
@@ -358,7 +357,7 @@ impl_runtime_apis! {
         fn retrieve_audit_record(content: Hash) -> bool {
 			true
 		}
-	}*/
+	}
 
 	impl sp_api::Metadata<Block> for Runtime {
 		fn metadata() -> OpaqueMetadata {
