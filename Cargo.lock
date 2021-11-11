@@ -370,28 +370,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "auditor-pallet-runtime-api"
-version = "0.0.1-monthly-2021-10"
-dependencies = [
- "parity-scale-codec",
- "sp-api",
- "sp-api-proc-macro",
- "sp-core",
- "sp-runtime",
-]
-
-[[package]]
-name = "auditor-rpc"
-version = "0.1.0"
-dependencies = [
- "auditor-pallet",
- "jsonrpc-core",
- "jsonrpc-core-client",
- "jsonrpc-derive",
- "parity-scale-codec",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3582,8 +3560,6 @@ name = "node-template-runtime"
 version = "3.0.0-monthly-2021-10"
 dependencies = [
  "auditor-pallet",
- "auditor-pallet-runtime-api",
- "auditor-rpc",
  "frame-benchmarking",
  "frame-executive",
  "frame-support",
