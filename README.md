@@ -1,6 +1,6 @@
 # TruthEye Node
 
-A fresh FRAME-based [Substrate](https://www.substrate.io/) node.
+A [Substrate](https://www.substrate.io/) based blockchain that where logs can be stored.
 
 ## Getting Started
 
