@@ -3520,7 +3520,7 @@ dependencies = [
 
 [[package]]
 name = "node-template"
-version = "3.0.0-monthly-2021-10"
+version = "3.0.0"
 dependencies = [
  "frame-benchmarking",
  "frame-benchmarking-cli",
@@ -3557,7 +3557,7 @@ dependencies = [
 
 [[package]]
 name = "node-template-runtime"
-version = "3.0.0-monthly-2021-10"
+version = "3.0.0"
 dependencies = [
  "auditor-pallet",
  "frame-benchmarking",
