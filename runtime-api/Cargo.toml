@@ -1,8 +1,0 @@
-[package]
-authors = ['Elly Richardson <elly.richardson18@gmail.com>']
-description = 'Runtime API for truth eye chain'
-edition = '2018'
-license = "Apache-2.0"
-name = "auditor-pallet-runtime-api"
-version = '0.0.1-monthly-2021-10'
-
