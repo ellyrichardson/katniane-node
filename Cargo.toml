@@ -6,6 +6,5 @@ members = [
     'node',
     'pallets/template',
     'pallets/auditor',
-    'runtime-api',
     'runtime',
 ]

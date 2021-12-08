@@ -370,21 +370,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "auditor-pallet-runtime-api"
-version = "0.0.1-monthly-2021-10"
-
-[[package]]
-name = "auditor-rpc"
-version = "0.1.0"
-dependencies = [
- "auditor-pallet",
- "jsonrpc-core",
- "jsonrpc-core-client",
- "jsonrpc-derive",
- "parity-scale-codec",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1886,8 +1871,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fcd999463524c52659517fe2cea98493cfe485d10565e7b0fb07dbba7ad2753"
 dependencies = [
  "cfg-if 1.0.0",
+ "js-sys",
  "libc",
  "wasi 0.10.0+wasi-snapshot-preview1",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -3533,7 +3520,7 @@ dependencies = [
 
 [[package]]
 name = "node-template"
-version = "3.0.0-monthly-2021-10"
+version = "3.0.0"
 dependencies = [
  "frame-benchmarking",
  "frame-benchmarking-cli",
@@ -3570,16 +3557,16 @@ dependencies = [
 
 [[package]]
 name = "node-template-runtime"
-version = "3.0.0-monthly-2021-10"
+version = "3.0.0"
 dependencies = [
  "auditor-pallet",
- "auditor-rpc",
  "frame-benchmarking",
  "frame-executive",
  "frame-support",
  "frame-system",
  "frame-system-benchmarking",
  "frame-system-rpc-runtime-api",
+ "getrandom 0.2.3",
  "hex-literal",
  "pallet-aura",
  "pallet-balances",
