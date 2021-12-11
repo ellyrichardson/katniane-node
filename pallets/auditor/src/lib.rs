@@ -20,6 +20,9 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
     use scale_info::TypeInfo;
     use frame_support::inherent::Vec;
+    use std::str;
+    use chrono::{DateTime, Utc, Duration};
+    use chrono::prelude::*;
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
@@ -36,15 +39,23 @@ pub mod pallet {
     pub struct AuditLog<AccountId> {
         // Change the timestamp to a timestamp type handled by Substrate itself
         // Reporter determines which system sent the log
-        //file_name: Vec<u8>,
+        title: Vec<u8>,
         content: Vec<u8>,
-        //timestamp: Vec<u8>,
+        timestamp: Vec<u8>,
         reporter: AccountId,
     }
 
     impl <T> AuditLog<T> {
+        pub fn get_title(self) -> Vec<u8> {
+            self.title
+        }
+
         pub fn get_content(self) -> Vec<u8> {
             self.content
+        }
+
+        pub fn get_timestamp(self) -> Vec<u8> {
+            self.timestamp
         }
 
         pub fn get_reporter(self) -> T {
@@ -124,15 +135,29 @@ pub mod pallet {
             // Verify audit log identifer is not taken
             ensure!(!AuditLogStorage::<T>::contains_key(&log_file_name, &log_timestamp), Error::<T>::AuditLogIdentifierAlreadyExists);
 
+            // ------------ (WIP - Begin)
+            // Might have to remove this WIP
+            let log_timestamp_string = match str::from_utf8(&log_timestamp) {
+                Ok(success) => success,
+                Err(error) => panic!("Invalid UTF-8 sequence: {}", error),
+            };
+
+            // convert the string into DateTime<FixedOffset>
+            let truncated_log_timestamp = DateTime::parse_from_rfc3339(log_timestamp_string).unwrap().round_subsecs(0);
+
+            // ------------ (WIP - End)
+
             let audit_log = AuditLog {
+                title: "test_item".encode(),
                 content: log_content,
+                timestamp: log_timestamp,
                 reporter: sender.clone(),
             };
 
-            <AuditLogStorage<T>>::insert(&log_file_name, &log_timestamp, audit_log);
+            <AuditLogStorage<T>>::insert(&log_file_name, &truncated_log_timestamp.to_rfc3339().to_string().into_bytes(), audit_log);
 
             // Emit the event that audit log has been added in chain
-            Self::deposit_event(Event::AuditLogInformationStored(log_file_name, log_timestamp, sender));
+            Self::deposit_event(Event::AuditLogInformationStored(log_file_name, truncated_log_timestamp.to_rfc3339().to_string().into_bytes(), sender));
 
             // Return a successful DispatchResult
             Ok(())
