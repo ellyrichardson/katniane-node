@@ -100,35 +100,6 @@ pub mod pallet {
             // Verify audit log identifer is not taken
             // ensure!(!AuditLogStorage::<T>::contains_key(&log_file_name, &log_date), Error::<T>::AuditLogIdentifierAlreadyExists);
 
-            // ------------ (WIP - Begin)
-            /*
-            // Might have to remove this WIP
-            let log_timestamp_string = match std::str::from_utf8(&log_timestamp) {
-                Ok(success) => success,
-                Err(error) => panic!("Invalid UTF-8 sequence: {}", error),
-            };
-
-            // convert the string into DateTime<FixedOffset>
-            let truncated_log_timestamp = DateTime::parse_from_rfc3339(log_timestamp_string).unwrap().round_subsecs(0);
-            //println!("the truncated_log_timestamp: {:?}", &truncated_log_timestamp.to_rfc3339().into_bytes());
-
-            // Add to timestamp with nanosecs collection if truncated timestamp key exists
-            if TimestampNanoSecStorage::<T>::contains_key(&log_file_name, &truncated_log_timestamp.to_rfc3339().into_bytes()) {
-                let mut timestamp_with_nanosec_list: Vec<Vec<u8>> = <TimestampNanoSecStorage<T>>::get(&log_file_name, &truncated_log_timestamp.to_rfc3339().into_bytes());
-                timestamp_with_nanosec_list.push(log_timestamp.clone());
-                <TimestampNanoSecStorage<T>>::insert(&log_file_name, &truncated_log_timestamp.to_rfc3339().into_bytes(), timestamp_with_nanosec_list);
-            } else {
-                // Insert initial truncated timestamp collection of nanosecs
-                let mut new_timestamp_with_nanosec_list = Vec::new();
-                new_timestamp_with_nanosec_list.push(&log_timestamp);
-                <TimestampNanoSecStorage<T>>::insert(&log_file_name, &truncated_log_timestamp.to_rfc3339().into_bytes(), new_timestamp_with_nanosec_list)
-            }*/
-
-            // ------------ (WIP - End)
-
-
-            
-
             let audit_log = AuditLog {
                 title: log_title,
                 content: log_content,
