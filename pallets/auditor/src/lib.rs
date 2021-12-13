@@ -20,9 +20,6 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
     use scale_info::TypeInfo;
     use frame_support::inherent::Vec;
-    use std::str;
-    use chrono::{DateTime, Utc, Duration};
-    use chrono::prelude::*;
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
@@ -63,52 +60,20 @@ pub mod pallet {
         }
     }
 
-    // Daily timestamps of a log file will be stored in the blockchain for consensus
-    // pub type AuditLogTimestamp = Vec<u8>;
-    // pub type AuditLogOf<T> = AuditLog<<T as frame_system::Config>::AccountId>;
-
-    /*#[pallet::storage]
-    #[pallet::getter(fn retrieve_audit_log)]
-    pub(super) type AuditLogStorage<T> = StorageMap<_, Blake2_128Concat, <T as frame_system::Config>::Hash, AuditLogOf<T>, ValueQuery>;*/
-
-    /*
-    #[pallet::storage]
-    #[pallet::getter(fn some_nmap)]
-    pub(super) type AuditLogStorage<T: Config> = StorageNMap<
-        _,
-        (
-            NMapKey<Blake2_128Concat, Vec<u8>>,
-            NMapKey<Blake2_128Concat, Vec<u8>>,
-        ),
-        AuditLog<T::AccountId>,
-        ValueQuery,
-    >;*/
-
-    /*
-    #[pallet::storage]
-    #[pallet::getter(fn some_nmap)]
-    pub(super) type AuditLogStorage<T: Config> = StorageDoubleMap<
-        _,
-        Blake2_128Concat,
-        Vec<u8>, // <-- key 1
-        Blake2_128Concat,
-        Vec<u8>, // <-- key 2
-        ValueQuery,
-    >;*/
-
     pub type AuditLogFileName = Vec<u8>;
-    pub type AuditLogTimestamp = Vec<u8>;
+    pub type AuditLogDate = Vec<u8>;
+    pub type AuditLogCollection<T> = Vec<AuditLog<T>>;
 
     #[pallet::storage]
     #[pallet::getter(fn retrieve_audit_log)]
-    pub(super) type AuditLogStorage<T: Config> = StorageDoubleMap<_, Blake2_128Concat, AuditLogFileName, Blake2_128Concat, AuditLogTimestamp, AuditLog<T::AccountId>, ValueQuery>;
-
+    pub(super) type AuditLogStorage<T: Config> = StorageDoubleMap<_, Blake2_128Concat, AuditLogFileName, Blake2_128Concat, AuditLogDate, Vec<AuditLog<T::AccountId>>, ValueQuery>;
+   
     #[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		/// Event documentation should end with an array that provides descriptive details for event
 		/// parameters. [something, who]
-		AuditLogInformationStored(AuditLogFileName, AuditLogTimestamp, T::AccountId),
+		AuditLogInformationStored(AuditLogFileName, AuditLogDate, T::AccountId),
 	}
 
     // Errors inform users that something went wrong.
@@ -127,37 +92,67 @@ pub mod pallet {
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		/// To add audit log
         #[pallet::weight(0)]
-        pub fn save_audit_log(origin: OriginFor<T>, log_file_name: Vec<u8>, log_content: Vec<u8>, log_timestamp: Vec<u8>) -> DispatchResult {
+        pub fn save_audit_log(origin: OriginFor<T>, log_file_name: Vec<u8>, log_date: Vec<u8>, log_title: Vec<u8>, log_content: Vec<u8>, log_timestamp: Vec<u8>) -> DispatchResult {
 
             // The dispatch origin of this call must be a participant.
             let sender = ensure_signed(origin)?;
 
             // Verify audit log identifer is not taken
-            ensure!(!AuditLogStorage::<T>::contains_key(&log_file_name, &log_timestamp), Error::<T>::AuditLogIdentifierAlreadyExists);
+            // ensure!(!AuditLogStorage::<T>::contains_key(&log_file_name, &log_date), Error::<T>::AuditLogIdentifierAlreadyExists);
 
             // ------------ (WIP - Begin)
+            /*
             // Might have to remove this WIP
-            let log_timestamp_string = match str::from_utf8(&log_timestamp) {
+            let log_timestamp_string = match std::str::from_utf8(&log_timestamp) {
                 Ok(success) => success,
                 Err(error) => panic!("Invalid UTF-8 sequence: {}", error),
             };
 
             // convert the string into DateTime<FixedOffset>
             let truncated_log_timestamp = DateTime::parse_from_rfc3339(log_timestamp_string).unwrap().round_subsecs(0);
+            //println!("the truncated_log_timestamp: {:?}", &truncated_log_timestamp.to_rfc3339().into_bytes());
+
+            // Add to timestamp with nanosecs collection if truncated timestamp key exists
+            if TimestampNanoSecStorage::<T>::contains_key(&log_file_name, &truncated_log_timestamp.to_rfc3339().into_bytes()) {
+                let mut timestamp_with_nanosec_list: Vec<Vec<u8>> = <TimestampNanoSecStorage<T>>::get(&log_file_name, &truncated_log_timestamp.to_rfc3339().into_bytes());
+                timestamp_with_nanosec_list.push(log_timestamp.clone());
+                <TimestampNanoSecStorage<T>>::insert(&log_file_name, &truncated_log_timestamp.to_rfc3339().into_bytes(), timestamp_with_nanosec_list);
+            } else {
+                // Insert initial truncated timestamp collection of nanosecs
+                let mut new_timestamp_with_nanosec_list = Vec::new();
+                new_timestamp_with_nanosec_list.push(&log_timestamp);
+                <TimestampNanoSecStorage<T>>::insert(&log_file_name, &truncated_log_timestamp.to_rfc3339().into_bytes(), new_timestamp_with_nanosec_list)
+            }*/
 
             // ------------ (WIP - End)
 
+
+            
+
             let audit_log = AuditLog {
-                title: "test_item".encode(),
+                title: log_title,
                 content: log_content,
                 timestamp: log_timestamp,
                 reporter: sender.clone(),
             };
 
-            <AuditLogStorage<T>>::insert(&log_file_name, &truncated_log_timestamp.to_rfc3339().to_string().into_bytes(), audit_log);
+            // --------
+
+            if AuditLogStorage::<T>::contains_key(&log_file_name, &log_date) {
+                let mut audit_log_collection = <AuditLogStorage<T>>::get(&log_file_name, &log_date);
+                audit_log_collection.push(audit_log.clone());
+                <AuditLogStorage<T>>::insert(&log_file_name, &log_date, audit_log_collection);
+            } else {
+                // Insert initial truncated timestamp collection of nanosecs
+                let mut new_audit_log_collection = Vec::new();
+                new_audit_log_collection.push(audit_log.clone());
+                <AuditLogStorage<T>>::insert(&log_file_name, &log_date, new_audit_log_collection)
+            }
+
+            // ------
 
             // Emit the event that audit log has been added in chain
-            Self::deposit_event(Event::AuditLogInformationStored(log_file_name, truncated_log_timestamp.to_rfc3339().to_string().into_bytes(), sender));
+            Self::deposit_event(Event::AuditLogInformationStored(log_file_name, log_date, sender));
 
             // Return a successful DispatchResult
             Ok(())
