@@ -106,9 +106,7 @@ pub mod pallet {
                 timestamp: log_timestamp,
                 reporter: sender.clone(),
             };
-
-            // --------
-
+            
             if AuditLogStorage::<T>::contains_key(&log_file_name, &log_date) {
                 let mut audit_log_collection = <AuditLogStorage<T>>::get(&log_file_name, &log_date);
                 audit_log_collection.push(audit_log.clone());
@@ -119,8 +117,6 @@ pub mod pallet {
                 new_audit_log_collection.push(audit_log.clone());
                 <AuditLogStorage<T>>::insert(&log_file_name, &log_date, new_audit_log_collection)
             }
-
-            // ------
 
             // Emit the event that audit log has been added in chain
             Self::deposit_event(Event::AuditLogInformationStored(log_file_name, log_date, sender));
