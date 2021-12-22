@@ -1,6 +1,6 @@
 # Katniane Node
 
-A [Substrate](https://www.substrate.io/) based blockchain that where logs can be stored.
+A rust-lang node for the [Substrate](https://www.substrate.io/) based Katniane blockchain where logs can be stored.
 
 ## Getting Started
 
