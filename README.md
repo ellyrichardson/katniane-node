@@ -1,10 +1,10 @@
-# TruthEye Node
+# Katniane Node
 
 A [Substrate](https://www.substrate.io/) based blockchain that where logs can be stored.
 
 ## Getting Started
 
-Follow the steps below to get started with the TruthEye Node.
+Follow the steps below to get started with the Katniane Node.
 
 ### Rust Setup
 
