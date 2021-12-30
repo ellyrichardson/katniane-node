@@ -194,8 +194,22 @@ git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-10'
 version = '4.0.0-dev'
 
+[dependencies.validator-set]
+default-features = false
+package = 'substrate-validator-set'
+git = 'https://github.com/gautamdhameja/substrate-validator-set.git'
+tag = 'monthly-2021-10+2'
+version = '4.0.0-dev'
+
+[dependencies.pallet-session]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-10'
+version = '4.0.0-dev'
+
 [dependencies]
 getrandom = { version = "0.2", features = ["js"] }
+thiserror = "1.0.30"
 
 [features]
 default = ['std']
@@ -237,4 +251,6 @@ std = [
     'sp-std/std',
     'sp-transaction-pool/std',
     'sp-version/std',
+    'validator-set/std',
+	'pallet-session/std',
 ]

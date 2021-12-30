@@ -14,10 +14,11 @@ use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
-	traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, IdentifyAccount, NumberFor, Verify},
+	traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, IdentifyAccount, NumberFor, Verify, OpaqueKeys},
 	transaction_validity::{TransactionSource, TransactionValidity},
 	ApplyExtrinsicResult, MultiSignature,
 };
+use frame_system::EnsureRoot;
 use sp_std::prelude::*;
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
@@ -283,6 +284,34 @@ impl auditor_pallet::Config for Runtime {
 	type Event = Event;
 }
 
+parameter_types! {
+	pub const MinAuthorities: u32 = 2;
+}
+
+impl validator_set::Config for Runtime {
+	type Event = Event;
+	type AddRemoveOrigin = EnsureRoot<AccountId>;
+	type MinAuthorities = MinAuthorities;
+}
+
+parameter_types! {
+	pub const Period: u32 = 2 * MINUTES;
+	pub const Offset: u32 = 0;
+}
+
+impl pallet_session::Config for Runtime {
+	type ValidatorId = <Self as frame_system::Config>::AccountId;
+	type ValidatorIdOf = validator_set::ValidatorOf<Self>;
+	type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
+	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
+	type SessionManager = ValidatorSet;
+	type SessionHandler = <opaque::SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
+	type Keys = opaque::SessionKeys;
+	type WeightInfo = ();
+	type Event = Event;
+	type DisabledValidatorsThreshold = ();
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -293,9 +322,11 @@ construct_runtime!(
 		System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Storage},
 		Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
+		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
+		ValidatorSet: validator_set::{Pallet, Call, Storage, Event<T>, Config<T>},
+		Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>},
 		Aura: pallet_aura::{Pallet, Config<T>},
 		Grandpa: pallet_grandpa::{Pallet, Call, Storage, Config, Event},
-		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
 		TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
 		Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
 		// Include the custom logic from the pallet-template in the runtime.
