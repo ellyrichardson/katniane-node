@@ -64,9 +64,14 @@ pub mod pallet {
     pub type AuditLogDate = Vec<u8>;
     pub type AuditLogCollection<T> = Vec<AuditLog<T>>;
 
+
     #[pallet::storage]
     #[pallet::getter(fn retrieve_audit_log)]
     pub(super) type AuditLogStorage<T: Config> = StorageDoubleMap<_, Blake2_128Concat, AuditLogFileName, Blake2_128Concat, AuditLogDate, Vec<AuditLog<T::AccountId>>, ValueQuery>;
+
+    #[pallet::storage]
+    #[pallet::getter(fn retrieve_audit_log_owner)]
+    pub(super) type AuditLogOwnerStorage<T: Config> = StorageMap<_, Blake2_128Concat, AuditLogFileName, T::AccountId, ValueQuery>;
    
     #[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -79,8 +84,7 @@ pub mod pallet {
     // Errors inform users that something went wrong.
 	#[pallet::error]
 	pub enum Error<T> {
-		/// This Audit Log ID exists in the chain.
-        AuditLogIdentifierAlreadyExists
+        AuditLogIdentifierCannotBeUsed
 	}
 
     // Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -107,15 +111,21 @@ pub mod pallet {
                 reporter: sender.clone(),
             };
             
+            // TODO: Update this 'if' statement to also check if storage contains key
             if AuditLogStorage::<T>::contains_key(&log_file_name, &log_date) {
-                let mut audit_log_collection = <AuditLogStorage<T>>::get(&log_file_name, &log_date);
-                audit_log_collection.push(audit_log.clone());
-                <AuditLogStorage<T>>::insert(&log_file_name, &log_date, audit_log_collection);
+                if AuditLogOwnerStorage::<T>::try_get(&log_file_name) == origin {
+                    let mut audit_log_collection = <AuditLogStorage<T>>::get(&log_file_name, &log_date);
+                    audit_log_collection.push(audit_log.clone());
+                    <AuditLogStorage<T>>::insert(&log_file_name, &log_date, audit_log_collection);
+                } else {
+                    // Throw error event that key is cannot be saved, and must choose different key name
+                }
             } else {
                 // Insert initial truncated timestamp collection of nanosecs
                 let mut new_audit_log_collection = Vec::new();
                 new_audit_log_collection.push(audit_log.clone());
                 <AuditLogStorage<T>>::insert(&log_file_name, &log_date, new_audit_log_collection)
+                // TODO: Track that the logkey is owned by the signer
             }
 
             // Emit the event that audit log has been added in chain
