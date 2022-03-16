@@ -110,22 +110,26 @@ pub mod pallet {
                 timestamp: log_timestamp,
                 reporter: sender.clone(),
             };
-            
-            // TODO: Update this 'if' statement to also check if storage contains key
-            if AuditLogStorage::<T>::contains_key(&log_file_name, &log_date) {
-                if AuditLogOwnerStorage::<T>::try_get(&log_file_name) == origin {
+
+            let log_owner = AuditLogOwnerStorage::<T>::try_get(&log_file_name);
+            match log_owner {
+                // log file name is already owned, meaning it is existing
+                Ok(owner) => {
+                    // check if log file name owner is the transaction sender
+                    frame_support::ensure!(&owner == &sender, <Error<T>>::AuditLogIdentifierCannotBeUsed);
                     let mut audit_log_collection = <AuditLogStorage<T>>::get(&log_file_name, &log_date);
                     audit_log_collection.push(audit_log.clone());
                     <AuditLogStorage<T>>::insert(&log_file_name, &log_date, audit_log_collection);
-                } else {
-                    // Throw error event that key is cannot be saved, and must choose different key name
                 }
-            } else {
-                // Insert initial truncated timestamp collection of nanosecs
-                let mut new_audit_log_collection = Vec::new();
-                new_audit_log_collection.push(audit_log.clone());
-                <AuditLogStorage<T>>::insert(&log_file_name, &log_date, new_audit_log_collection)
-                // TODO: Track that the logkey is owned by the signer
+                Err(error) => {
+                    // No owner for this log name yet, therefore it is not existing and is available
+                    let mut new_audit_log_collection = Vec::new();
+                    new_audit_log_collection.push(audit_log.clone());
+                    <AuditLogStorage<T>>::insert(&log_file_name, &log_date, new_audit_log_collection);
+
+                    // Track that the log name is owned by the sender
+                    <AuditLogOwnerStorage<T>>::insert(&log_file_name, &sender);
+                }
             }
 
             // Emit the event that audit log has been added in chain
