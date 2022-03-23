@@ -31,7 +31,7 @@ fn save_audit_log_one_item() {
 }
 
 #[test]
-fn save_audit_log_two_items() {
+fn save_audit_log_with_sender_saving_two_items_on_same_logname_it_owns() {
 	new_test_ext().execute_with(|| {
 		let sender = Origin::signed(1);
 		let file_name = "log-file-name".encode();
@@ -54,6 +54,29 @@ fn save_audit_log_two_items() {
 		let retrieve_file_name = "log-file-name".encode();
 		let retrieve_date = "2021-10-08".encode();
 		assert_eq!(Auditor::retrieve_audit_log(retrieve_file_name, retrieve_date).len(), 2);
+	});
+}
+
+#[test]
+fn dont_save_audit_log_if_a_sender_saves_on_already_taken_log() {
+	new_test_ext().execute_with(|| {
+		let sender = Origin::signed(1);
+		let file_name = "log-file-name".encode();
+		let date = "2021-10-08".encode();
+		let title = "log-title".encode();
+		let content = "transaction with id 123 is processed".encode();
+		let timestamp = "2021-10-08 17:30:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender, file_name, date, title, content, timestamp));
+
+		let sender2 = Origin::signed(2);
+		let file_name2 = "log-file-name".encode();
+		let date2 = "2021-10-08".encode();
+		let title2 = "log-title".encode();
+		let content2 = "transaction with id 123 is processed".encode();
+		let timestamp2 = "2021-10-08 17:45:00 UTC".encode();
+		// Ensure that error is raised when another sender attempts to save with an already taken log name
+		assert_noop!(Auditor::save_audit_log(sender2, file_name2, date2, title2, content2, timestamp2),Error::<Test>::AuditLogIdentifierCannotBeUsed);
 	});
 }
 
