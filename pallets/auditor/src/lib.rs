@@ -114,7 +114,10 @@ pub mod pallet {
         AuditLogIdentifierCannotBeUsed,
         NoRightsToOpenAuditLogForClaiming,
         NotExistingAuditLogCantBeOpenForClaiming,
-        NotAuthorizedToClaimAuditLog
+        NotAuthorizedToClaimAuditLog,
+        AuditLogAlreadyOpenedForClaiming.
+        AuditLogCantBeFound,
+        AuditLogNotOpenedForClaiming
 	}
 
     // Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -194,7 +197,8 @@ pub mod pallet {
                     Self::deposit_event(Event::AuditLogClaimedForOwnership(log_file_name, sender));
                 }
                 Err(error) => {
-                    // TODO: Do something when the log file is not opened for claiming
+                    // Raise error when the log file is not opened for claiming
+                    frame_support::ensure!(0 == 1, <Error<T>>::AuditLogNotOpenedForClaiming);
                 }
             }
 
@@ -224,19 +228,21 @@ pub mod pallet {
                     let is_log_already_open = AuditLogOpenForClaimStorage::<T>::try_get(&audit_log_open_for_claim);
                     match is_log_already_open {
                         Ok(is_log_already_open) => {
+                            // Raise an error that the log is already opened
+                            frame_support::ensure!(0 == 1, <Error<T>>::AuditLogAlreadyOpenedForClaiming);
+                        }
+                        Err(error) => {
                             // Open the log for ownership claim 
                             <AuditLogOpenForClaimStorage<T>>::insert(&audit_log_open_for_claim, claimer_account_id);
 
                             // Emit the event that an audit log has been opened for claiming
                             Self::deposit_event(Event::AuditLogOpenedForOwnershipClaim(log_file_name, log_date, sender));
                         }
-                        Err(error) => {
-                            // TODO: Maybe do something, like raise an error, if log is already opened for claiming
-                        }
                     }
                 }
                 Err(error) => {
-                    // TODO: The log to opened does not not exist, Raise an error that indicates the possibilities
+                    // The log opened does not exist since it has no owner, Raise an error
+                    frame_support::ensure!(0 == 1, <Error<T>>::AuditLogCantBeFound);
                 }
             }
             
