@@ -42,6 +42,13 @@ pub mod pallet {
         reporter: AccountId,
     }
 
+    #[derive(Encode, Decode, Clone, Default, Eq, PartialEq, Debug, TypeInfo)]
+    pub struct AuditLogOpenForClaim {
+        filename: Vec<u8>,
+        // timestamp is in unix epoch
+        opened_for_claim_timestamp: u64,
+    }
+
     impl <T> AuditLog<T> {
         pub fn get_title(self) -> Vec<u8> {
             self.title
@@ -60,9 +67,21 @@ pub mod pallet {
         }
     }
 
+    impl AuditLogOpenForClaim {
+        pub fn get_filename(self) -> Vec<u8> {
+            self.filename
+        }
+
+        pub fn get_claim_expiration_timestamp(self) -> Vec<u8> {
+            self.claim_expiration_timestamp
+        }
+    }
+
     pub type AuditLogFileName = Vec<u8>;
     pub type AuditLogDate = Vec<u8>;
-    pub type AuditLogCollection<T> = Vec<AuditLog<T>>;
+    pub type AuditLogCollection<T> = Vec<AuditLog<T>>; // not used
+    pub type AuditLogOwnerCollection<T> = Vec<T::AccountId>; // not used
+    pub type AuditLogClaimCode = T::AccountId;
 
 
     #[pallet::storage]
@@ -71,7 +90,11 @@ pub mod pallet {
 
     #[pallet::storage]
     #[pallet::getter(fn retrieve_audit_log_owner)]
-    pub(super) type AuditLogOwnerStorage<T: Config> = StorageMap<_, Blake2_128Concat, AuditLogFileName, T::AccountId, ValueQuery>;
+    pub(super) type AuditLogOwnerStorage<T: Config> = StorageMap<_, Blake2_128Concat, AuditLogFileName, Vec<T::AccountId>, ValueQuery>;
+
+    #[pallet::storage]
+    #[pallet::getter(fn retrieve_audit_log_open_for_claim)]
+    pub(super) type AuditLogOpenForClaimStorage<T: Config> = StorageMap<_, Blake2_128Concat, AuditLogOpenForClaim, AuditLogClaimCode, ValueQuery>;
    
     #[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -79,12 +102,19 @@ pub mod pallet {
 		/// Event documentation should end with an array that provides descriptive details for event
 		/// parameters. [something, who]
 		AuditLogInformationStored(AuditLogFileName, AuditLogDate, T::AccountId),
+        // T::AccountId is included to specify who claimed the open log
+        AuditLogClaimedForOwnership(AuditLogFileName, T::AccountId),
+        // T::AccountId is included to specify who opened the log for claiming
+        AuditLogOpenedForOwnershipClaim(AuditLogFileName, T::AccountId),
 	}
 
     // Errors inform users that something went wrong.
 	#[pallet::error]
 	pub enum Error<T> {
-        AuditLogIdentifierCannotBeUsed
+        AuditLogIdentifierCannotBeUsed,
+        NoRightsToOpenAuditLogForClaiming,
+        NotExistingAuditLogCantBeOpenForClaiming,
+        NotAuthorizedToClaimAuditLog
 	}
 
     // Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -100,9 +130,6 @@ pub mod pallet {
 
             // The dispatch origin of this call must be a participant.
             let sender = ensure_signed(origin)?;
-
-            // Verify audit log identifer is not taken
-            // ensure!(!AuditLogStorage::<T>::contains_key(&log_file_name, &log_date), Error::<T>::AuditLogIdentifierAlreadyExists);
 
             let audit_log = AuditLog {
                 title: log_title,
@@ -128,13 +155,91 @@ pub mod pallet {
                     <AuditLogStorage<T>>::insert(&log_file_name, &log_date, new_audit_log_collection);
 
                     // Track that the log name is owned by the sender
-                    <AuditLogOwnerStorage<T>>::insert(&log_file_name, &sender);
+                    let mut new_audit_log_owners_collection = Vec::new();
+                    new_audit_log_owners_collection.push(sender.clone());
+                    <AuditLogOwnerStorage<T>>::insert(&log_file_name, new_audit_log_owners_collection);
                 }
             }
 
             // Emit the event that audit log has been added in chain
             Self::deposit_event(Event::AuditLogInformationStored(log_file_name, log_date, sender));
 
+            // Return a successful DispatchResult
+            Ok(())
+        }
+
+        // TODO: Clean up the code for this function if possible
+        #[pallet::weight(0)]
+        pub fn claim_log(origin: OriginFor<T>, log_file_name: Vec<u8>) -> DispatchResult {
+
+            // The dispatch origin of this call must be a participant.
+            let claimer = ensure_signed(origin)?;
+
+            // Checks if the audit log is open for claiming, and returns the assigned claimer for the log available for claiming
+            let assigned_claimer = AuditLogOpenForClaimStorage::<T>::try_get(&log_file_name);
+            match assigned_claimer {
+                Ok(assigned_claimer) => {
+                    // Checks if claimer is the assigned claimer
+                    frame_support::ensure!(&claimer == &assigned_claimer, <Error<T>>::NotAuthorizedToClaimAuditLog);
+
+                    // Add the claimer as an owner of the audit log
+                    let mut audit_log_owners_collection = <AuditLogOwnerStorage<T>>::get(&log_file_name);
+                    audit_log_owners_collection.push(claimer.clone());
+                    <AuditLogOwnerStorage<T>>::insert(&log_file_name, audit_log_owners_collection);
+
+                    // Remove the audit log as open for claiming so that is not open anymore (delete from the AuditLogOpenForClaimStorage)
+                    <AuditLogOpenForClaimStorage<T>>::remove(&log_file_name);
+
+                    // Emit the event that the audit log has been claimed
+                    Self::deposit_event(Event::AuditLogClaimedForOwnership(log_file_name, sender));
+                }
+                Err(error) => {
+                    // TODO: Do something when the log file is not opened for claiming
+                }
+            }
+
+            // Return a successful DispatchResult
+            Ok(())
+        }
+
+        // TODO: Clean up the code for this function if possible 
+        #[pallet::weight(0)]
+        pub fn open_log_for_ownership_claim(origin: OriginFor<T>, log_file_name: Vec<u8>, claimer_pubkey: u32) -> DispatchResult {
+
+            // The dispatch origin of this call must be a participant.
+            let sender = ensure_signed(origin)?;
+
+            // Convert u32 raw byte to AccountId of the would be assigned claimer
+            let claimer_account_id = T::AccountId::decode(&mut &claimer_pubkey[..]).unwrap_or_default();
+
+            // Check if log is owned by someone
+            let log_owner = AuditLogOwnerStorage::<T>::try_get(&log_file_name);
+            match log_owner {
+                // Log is owned by someone
+                Ok(owner) => {
+                    // Check if log is owned by the function caller
+                    frame_support::ensure!(&owner == &sender, <Error<T>>::NoRightsToOpenAuditLogForClaiming);
+
+                    // Check if the file is already open for claiming. Only one claiming can happen at a time
+                    let is_log_already_open = AuditLogOpenForClaimStorage::<T>::try_get(&audit_log_open_for_claim);
+                    match is_log_already_open {
+                        Ok(is_log_already_open) => {
+                            // Open the log for ownership claim 
+                            <AuditLogOpenForClaimStorage<T>>::insert(&audit_log_open_for_claim, claimer_account_id);
+
+                            // Emit the event that an audit log has been opened for claiming
+                            Self::deposit_event(Event::AuditLogOpenedForOwnershipClaim(log_file_name, log_date, sender));
+                        }
+                        Err(error) => {
+                            // TODO: Maybe do something, like raise an error, if log is already opened for claiming
+                        }
+                    }
+                }
+                Err(error) => {
+                    // TODO: The log to opened does not not exist, Raise an error that indicates the possibilities
+                }
+            }
+            
             // Return a successful DispatchResult
             Ok(())
         }
