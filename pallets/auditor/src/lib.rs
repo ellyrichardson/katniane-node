@@ -221,7 +221,7 @@ pub mod pallet {
 
         // TODO: Clean up the code for this function if possible 
         #[pallet::weight(0)]
-        pub fn open_log_for_ownership_claim(origin: OriginFor<T>, log_file_name: Vec<u8>, claimer_pubkey: u32) -> DispatchResult {
+        pub fn open_log_for_ownership_claim(origin: OriginFor<T>, log_file_name: Vec<u8>, claimer_pubkey: [u8; 32]) -> DispatchResult {
 
             // The dispatch origin of this call must be a participant.
             let sender = ensure_signed(origin)?;
