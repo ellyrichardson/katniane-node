@@ -106,3 +106,24 @@ fn save_audit_log_two_items_but_different_keys() {
 		assert_eq!(Auditor::retrieve_audit_log(retrieve_file_name, retrieve_date).len(), 1);
 	});
 }
+
+#[test]
+fn open_log_for_ownership_claim() {
+	new_test_ext().execute_with(|| {
+
+		// SETUP
+		let sender = Origin::signed(1);
+		let file_name = "log-file-name".encode();
+		let date = "2021-10-08".encode();
+		let title = "log-title".encode();
+		let content = "transaction with id 123 is processed".encode();
+		let timestamp = "2021-10-08 17:30:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender, file_name, date, title, content, timestamp));
+
+		// ASSERT
+		assert_ok!(open_log_for_ownership_claim(Origin::signed(1), "log-file-name".encode(), "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".encode()));
+
+		// --------
+	});
+}
