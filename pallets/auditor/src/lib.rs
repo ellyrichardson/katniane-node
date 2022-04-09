@@ -226,6 +226,7 @@ pub mod pallet {
             // The dispatch origin of this call must be a participant.
             let sender = ensure_signed(origin)?;
 
+            // TODO: Add a checker that the claimer_pubkey is length 32
             // Convert u32 raw byte to AccountId of the would be assigned claimer
             let claimer_account_id = T::AccountId::decode(&mut &claimer_pubkey[..]).unwrap_or_default();
 

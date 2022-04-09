@@ -111,7 +111,28 @@ fn save_audit_log_two_items_but_different_keys() {
 fn open_log_for_ownership_claim() {
 	new_test_ext().execute_with(|| {
 
-		// SETUP
+		// SETUP to have an audit log saved
+		let sender = Origin::signed(1);
+		let file_name = "log-file-name".encode();
+		let date = "2021-10-08".encode();
+		let title = "log-title".encode();
+		let content = "transaction with id 123 is processed".encode();
+		let timestamp = "2021-10-08 17:30:00 UTC".encode();
+		assert_ok!(Auditor::save_audit_log(sender, file_name, date, title, content, timestamp));
+
+		// ASSERT
+		assert_ok!(Auditor::open_log_for_ownership_claim(Origin::signed(1), "log-file-name".encode(), [0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1]));
+
+		// --------
+	});
+}
+
+// TODO: Complete this test
+#[test]
+fn claim_ownership_of_opened_log() {
+	new_test_ext().execute_with(|| {
+
+		// SETUP to have an audit log saved
 		let sender = Origin::signed(1);
 		let file_name = "log-file-name".encode();
 		let date = "2021-10-08".encode();
@@ -121,9 +142,10 @@ fn open_log_for_ownership_claim() {
 		// Dispatch a signed extrinsic.
 		assert_ok!(Auditor::save_audit_log(sender, file_name, date, title, content, timestamp));
 
+		// TODO: need to come up with a way to make the claimer id a real one, instead of random [u8; 32]
 		// ASSERT
-		assert_ok!(open_log_for_ownership_claim(Origin::signed(1), "log-file-name".encode(), "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty".encode()));
-
+		assert_ok!(Auditor::open_log_for_ownership_claim(Origin::signed(1), "log-file-name".encode(), [0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1]));
+		// Assert successful claiming of logs here
 		// --------
 	});
 }
