@@ -146,6 +146,7 @@ fn claim_ownership_of_opened_log() {
 		// ASSERT
 		assert_ok!(Auditor::open_log_for_ownership_claim(Origin::signed(1), "log-file-name".encode(), [0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1]));
 		// Assert successful claiming of logs here
+		
 		// --------
 	});
 }
