@@ -1,5 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use scale_info::prelude::vec::Vec;
+
 /// Edit this file to define custom logic or remove it if it is not needed.
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// <https://substrate.dev/docs/en/knowledgebase/runtime/frame>
@@ -198,13 +200,16 @@ pub mod pallet {
                     // Checks if claimer is the assigned claimer
                     frame_support::ensure!(&claimer == &audit_log_for_claim.assigned_claimer, <Error<T>>::NotAuthorizedToClaimAuditLog);
 
+                    /*
                     // Add the claimer as an owner of the audit log
                     let mut audit_log_owners_collection = <AuditLogOwnerStorage<T>>::get(&log_file_name);
                     audit_log_owners_collection.push(claimer.clone());
                     <AuditLogOwnerStorage<T>>::insert(&log_file_name, audit_log_owners_collection);
 
                     // Remove the audit log as open for claiming so that is not open anymore (delete from the AuditLogOpenForClaimStorage)
-                    <AuditLogOpenForClaimStorage<T>>::remove(&log_file_name);
+                    <AuditLogOpenForClaimStorage<T>>::remove(&log_file_name);*/
+
+                    Self::add_claimer_as_log_owner(&log_file_name, claimer.clone());
 
                     // Emit the event that the audit log has been claimed
                     Self::deposit_event(Event::AuditLogClaimedForOwnership(log_file_name, claimer));
@@ -261,8 +266,6 @@ pub mod pallet {
                     } else {
                         frame_support::ensure!(0 == 1, <Error<T>>::NoRightsToOpenAuditLogForClaiming);
                     }
-
-                    
                 }
                 Err(error) => {
                     // The log opened does not exist since it has no owner, Raise an error
@@ -273,5 +276,18 @@ pub mod pallet {
             // Return a successful DispatchResult
             Ok(())
         }
+	}
+}
+
+impl<T: Config> Pallet<T> {
+
+	fn add_claimer_as_log_owner(log_file_name: &Vec<u8>, claimer: T::AccountId) {
+		// Add the claimer as an owner of the audit log
+        let mut audit_log_owners_collection = AuditLogOwnerStorage::<T>::get(log_file_name);
+        audit_log_owners_collection.push(claimer);
+        AuditLogOwnerStorage::<T>::insert(log_file_name, audit_log_owners_collection);
+
+        // Remove the audit log as open for claiming so that is not open anymore (delete from the AuditLogOpenForClaimStorage)
+        AuditLogOpenForClaimStorage::<T>::remove(log_file_name);
 	}
 }
