@@ -161,7 +161,7 @@ pub mod pallet {
                         frame_support::ensure!(0 == 1, <Error<T>>::AuditLogIdentifierCannotBeUsed);
                     }
                 }
-                Err(error) => {
+                Err(_error) => {
                     // No owner for this log name yet, therefore it is not existing and is available
                     let mut new_audit_log_collection = Vec::new();
                     new_audit_log_collection.push(audit_log.clone());
@@ -181,7 +181,6 @@ pub mod pallet {
             Ok(())
         }
 
-        // TODO: Clean up the code for this function if possible
         #[pallet::weight(0)]
         pub fn claim_log(origin: OriginFor<T>, log_file_name: Vec<u8>) -> DispatchResult {
 
@@ -200,21 +199,12 @@ pub mod pallet {
                     // Checks if claimer is the assigned claimer
                     frame_support::ensure!(&claimer == &audit_log_for_claim.assigned_claimer, <Error<T>>::NotAuthorizedToClaimAuditLog);
 
-                    /*
-                    // Add the claimer as an owner of the audit log
-                    let mut audit_log_owners_collection = <AuditLogOwnerStorage<T>>::get(&log_file_name);
-                    audit_log_owners_collection.push(claimer.clone());
-                    <AuditLogOwnerStorage<T>>::insert(&log_file_name, audit_log_owners_collection);
-
-                    // Remove the audit log as open for claiming so that is not open anymore (delete from the AuditLogOpenForClaimStorage)
-                    <AuditLogOpenForClaimStorage<T>>::remove(&log_file_name);*/
-
                     Self::add_claimer_as_log_owner(&log_file_name, claimer.clone());
 
                     // Emit the event that the audit log has been claimed
                     Self::deposit_event(Event::AuditLogClaimedForOwnership(log_file_name, claimer));
                 }
-                Err(error) => {
+                Err(_error) => {
                     // Raise error when the log file is not opened for claiming
                     frame_support::ensure!(0 == 1, <Error<T>>::AuditLogNotOpenedForClaiming);
                 }
@@ -231,10 +221,6 @@ pub mod pallet {
             // The dispatch origin of this call must be a participant.
             let sender = ensure_signed(origin)?;
 
-            // TODO: Add a checker that the claimer_pubkey is length 32
-            // Convert u32 raw byte to AccountId of the would be assigned claimer
-            let claimer_account_id = T::AccountId::decode(&mut &claimer_pubkey[..]).unwrap_or_default();
-
             // Check if log is owned by someone
             let log_owners = AuditLogOwnerStorage::<T>::try_get(&log_file_name);
             match log_owners {
@@ -245,11 +231,14 @@ pub mod pallet {
                         // Check if the file is already open for claiming. Only one claiming can happen at a time
                         let is_log_already_open = AuditLogOpenForClaimStorage::<T>::try_get(&log_file_name);
                         match is_log_already_open {
-                            Ok(is_log_already_open) => {
+                            Ok(_is_log_already_open) => {
                                // Raise an error that the log is already opened
                                 frame_support::ensure!(0 == 1, <Error<T>>::AuditLogAlreadyOpenedForClaiming);
                             }
-                            Err(error) => {
+                            Err(_error) => {
+                                // Convert u32 raw byte to AccountId of the would be assigned claimer
+                                let claimer_account_id = T::AccountId::decode(&mut &claimer_pubkey[..]).unwrap_or_default();
+
                                 let audit_log_open_for_claim = AuditLogOpenForClaim {
                                     filename: log_file_name.clone(),
                                     assigned_claimer: claimer_account_id.clone(),
@@ -267,7 +256,7 @@ pub mod pallet {
                         frame_support::ensure!(0 == 1, <Error<T>>::NoRightsToOpenAuditLogForClaiming);
                     }
                 }
-                Err(error) => {
+                Err(_error) => {
                     // The log opened does not exist since it has no owner, Raise an error
                     frame_support::ensure!(0 == 1, <Error<T>>::AuditLogCantBeFound);
                 }
