@@ -286,12 +286,15 @@ impl<T: Config> Pallet<T> {
         // Offset of logs is the measure of unneeded logs before the logs that are actually needed
         let audit_log_offset = (&selected_page_num - 1) * &max_result_count;
         // Limit of logs to be retrieved past the offset in the collection
-        let audit_log_limit = &audit_log_offset + &max_result_count;
+        let mut audit_log_limit = &audit_log_offset + &max_result_count;
 
         // TODO: Find out why "pallet::AuditLog<<T as frame_system::Config>::AccountId>" works after Vec:: but not by itself
         let mut paginated_audit_logs = Vec::<pallet::AuditLog<<T as frame_system::Config>::AccountId>>::new();
 
-        // TODO: Handle if the limit is larger than the actual length of the vector
+        // Use actual length of audit logs Vector if the limit is larger than the actual length of the vector
+        if audit_log_limit >= audit_logs.len() as u32 {
+            audit_log_limit = audit_logs.len() as u32;
+        }
 
         if selected_page_num <= 1 {
             for i in 0..(max_result_count) {
