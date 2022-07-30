@@ -150,3 +150,168 @@ fn claim_ownership_of_opened_log() {
 		// --------
 	});
 }
+
+#[test]
+fn retrieve_paginated_audit_log_with_one_as_selected_page_number() {
+	new_test_ext().execute_with(|| {
+		let sender = Origin::signed(1);
+		let file_name = "log-file-name".encode();
+		let date = "2021-10-08".encode();
+		let title = "log-title".encode();
+		let content = "transaction with id 123 is processed".encode();
+		let timestamp = "2021-10-08 17:30:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender, file_name, date, title, content, timestamp.clone()));
+
+		let sender2 = Origin::signed(1);
+		let file_name2 = "log-file-name".encode();
+		let date2 = "2021-10-08".encode();
+		let title2 = "log-title".encode();
+		let content2 = "transaction with id 123 is processed".encode();
+		let timestamp2 = "2021-10-08 17:31:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender2, file_name2, date2, title2, content2, timestamp2.clone()));
+
+		let sender3 = Origin::signed(1);
+		let file_name3 = "log-file-name".encode();
+		let date3 = "2021-10-08".encode();
+		let title3 = "log-title".encode();
+		let content3 = "transaction with id 123 is processed".encode();
+		let timestamp3 = "2021-10-08 17:32:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender3, file_name3, date3, title3, content3, timestamp3.clone()));
+
+		let sender4 = Origin::signed(1);
+		let file_name4 = "log-file-name".encode();
+		let date4 = "2021-10-08".encode();
+		let title4 = "log-title".encode();
+		let content4 = "transaction with id 123 is processed".encode();
+		let timestamp4 = "2021-10-08 17:33:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender4, file_name4, date4, title4, content4, timestamp4.clone()));
+
+		let sender5 = Origin::signed(1);
+		let file_name5 = "log-file-name".encode();
+		let date5 = "2021-10-08".encode();
+		let title5 = "log-title".encode();
+		let content5 = "transaction with id 123 is processed".encode();
+		let timestamp5 = "2021-10-08 17:34:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender5, file_name5, date5, title5, content5, timestamp5.clone()));
+
+		let retrieve_file_name = "log-file-name".encode();
+		let retrieve_date = "2021-10-08".encode();
+		let max_result_count = 3;
+		let selected_page_number = 1;
+		let paginated_audit_logs = Auditor::retrieve_paginated_audit_logs(retrieve_file_name, retrieve_date, max_result_count, selected_page_number);
+
+		assert_eq!(paginated_audit_logs.len(), 3);
+		// These assertions ensure that only the first 3 items are returned, which is determined by the timestamp
+		for result in paginated_audit_logs {
+			if result.clone().get_timestamp() == timestamp.clone() {
+				// Pass the assertion
+				println!("[*] Audit Log 1 retrieved");
+				assert_eq!(1, 1);
+			} else if result.clone().get_timestamp() == timestamp2.clone() {
+				// Pass the assertion
+				println!("[*] Audit Log 2 retrieved");
+				assert_eq!(1, 1);
+			} else if result.clone().get_timestamp() == timestamp3.clone() {
+				// Pass the assertion
+				println!("[*] Audit Log 3 retrieved");
+				assert_eq!(1, 1);
+			} else {
+				// Fail the assertion
+				println!("[*] Expected Audit Log not retrieved");
+				assert_eq!(0, 1);
+			}
+		} 
+	});
+}
+
+#[test]
+fn retrieve_paginated_audit_log_with_two_as_selected_page_number() {
+	new_test_ext().execute_with(|| {
+		let sender = Origin::signed(1);
+		let file_name = "log-file-name".encode();
+		let date = "2021-10-08".encode();
+		let title = "log-title".encode();
+		let content = "transaction with id 123 is processed".encode();
+		let timestamp = "2021-10-08 17:30:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender, file_name, date, title, content, timestamp.clone()));
+
+		let sender2 = Origin::signed(1);
+		let file_name2 = "log-file-name".encode();
+		let date2 = "2021-10-08".encode();
+		let title2 = "log-title".encode();
+		let content2 = "transaction with id 123 is processed".encode();
+		let timestamp2 = "2021-10-08 17:31:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender2, file_name2, date2, title2, content2, timestamp2.clone()));
+
+		let sender3 = Origin::signed(1);
+		let file_name3 = "log-file-name".encode();
+		let date3 = "2021-10-08".encode();
+		let title3 = "log-title".encode();
+		let content3 = "transaction with id 123 is processed".encode();
+		let timestamp3 = "2021-10-08 17:32:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender3, file_name3, date3, title3, content3, timestamp3.clone()));
+
+		let sender4 = Origin::signed(1);
+		let file_name4 = "log-file-name".encode();
+		let date4 = "2021-10-08".encode();
+		let title4 = "log-title".encode();
+		let content4 = "transaction with id 123 is processed".encode();
+		let timestamp4 = "2021-10-08 17:33:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender4, file_name4, date4, title4, content4, timestamp4.clone()));
+
+		let sender5 = Origin::signed(1);
+		let file_name5 = "log-file-name".encode();
+		let date5 = "2021-10-08".encode();
+		let title5 = "log-title".encode();
+		let content5 = "transaction with id 123 is processed".encode();
+		let timestamp5 = "2021-10-08 17:34:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender5, file_name5, date5, title5, content5, timestamp5.clone()));
+
+		let sender6 = Origin::signed(1);
+		let file_name6 = "log-file-name".encode();
+		let date6 = "2021-10-08".encode();
+		let title6 = "log-title".encode();
+		let content6 = "transaction with id 123 is processed".encode();
+		let timestamp6 = "2021-10-08 17:35:00 UTC".encode();
+		// Dispatch a signed extrinsic.
+		assert_ok!(Auditor::save_audit_log(sender6, file_name6, date6, title6, content6, timestamp6.clone()));
+
+		let retrieve_file_name = "log-file-name".encode();
+		let retrieve_date = "2021-10-08".encode();
+		let max_result_count = 3;
+		let selected_page_number = 2;
+		let paginated_audit_logs = Auditor::retrieve_paginated_audit_logs(retrieve_file_name, retrieve_date, max_result_count, selected_page_number);
+
+		assert_eq!(paginated_audit_logs.len(), 3);
+		// These assertions ensure that only the last 3 items are returned, which is determined by the timestamp
+		for result in paginated_audit_logs {
+			if result.clone().get_timestamp() == timestamp4.clone() {
+				// Pass the assertion
+				println!("[*] Audit Log 4 retrieved");
+				assert_eq!(1, 1);
+			} else if result.clone().get_timestamp() == timestamp5.clone() {
+				// Pass the assertion
+				println!("[*] Audit Log 5 retrieved");
+				assert_eq!(1, 1);
+			} else if result.clone().get_timestamp() == timestamp6.clone() {
+				// Pass the assertion
+				println!("[*] Audit Log 6 retrieved");
+				assert_eq!(1, 1);
+			} else {
+				// Fail the assertion
+				println!("[*] Expected Audit Log not retrieved");
+				assert_eq!(0, 1);
+			}
+		} 
+	});
+}
