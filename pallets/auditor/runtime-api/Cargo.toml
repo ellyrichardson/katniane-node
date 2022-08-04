@@ -1,0 +1,33 @@
+[package]
+name = 'auditor-runtime-api'
+version = '1.0.0'
+description = 'Runtime API for the auditor pallet.'
+authors = ['Elly Richardson']
+homepage = 'https://substrate.dev'
+edition = '2018'
+license = 'Unlicense'
+publish = false
+#repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
+
+[dependencies.auditor-pallet]
+default-features = false
+path = '../'
+version = '3.0.0-monthly-2021-10'
+
+[dependencies.sp-api]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-10'
+version = '4.0.0-dev'
+
+[dependencies.frame-system]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-10'
+version = '4.0.0-dev'
+
+[features]
+default = ['std']
+std = [
+    'sp-api/std',
+]

@@ -370,6 +370,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "auditor-runtime-api"
+version = "1.0.0"
+dependencies = [
+ "auditor-pallet",
+ "frame-system",
+ "sp-api",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3560,6 +3569,7 @@ name = "node-template-runtime"
 version = "3.0.0"
 dependencies = [
  "auditor-pallet",
+ "auditor-runtime-api",
  "frame-benchmarking",
  "frame-executive",
  "frame-support",
