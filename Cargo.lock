@@ -374,6 +374,7 @@ name = "auditor-runtime-api"
 version = "1.0.0"
 dependencies = [
  "auditor-pallet",
+ "frame-support",
  "frame-system",
  "sp-api",
 ]

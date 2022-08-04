@@ -2,6 +2,7 @@
 
 pub use auditor_pallet::AuditLog;
 pub use frame_system::Config;
+pub use frame_support::inherent::Vec;
 
 sp_api::decl_runtime_apis! {
 	#[api_version(5)]
