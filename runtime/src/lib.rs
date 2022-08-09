@@ -11,7 +11,7 @@ use pallet_grandpa::{
 };
 use sp_api::impl_runtime_apis;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use frame_system::Config as AuditorConfig;
+//use frame_system::Config as AuditorConfig;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
@@ -334,12 +334,12 @@ pub type Executive = frame_executive::Executive<
 
 impl_runtime_apis! {
 
-	impl<T: AuditorConfig> auditor_runtime_api::LogsRetrieval<Block, T> for Runtime {
+	impl auditor_runtime_api::LogsRetrieval<Block, Runtime> for Runtime {
 		fn retrieve_paginated_audit_log(log_key: Vec<u8>, 
 			log_date: Vec<u8>, 
 			max_result_count: u32, 
 			selected_page_num: u32) 
-			-> Vec::<auditor_pallet::AuditLog<T::AccountId>> 
+			-> Vec::<auditor_pallet::AuditLog<AccountId>>
 		{
 			Auditor::retrieve_paginated_audit_logs(log_key, log_date, max_result_count, selected_page_num)
 		}
