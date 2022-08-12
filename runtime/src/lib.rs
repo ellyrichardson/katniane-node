@@ -334,7 +334,7 @@ pub type Executive = frame_executive::Executive<
 
 impl_runtime_apis! {
 
-	impl auditor_runtime_api::LogsRetrieval<Block, Runtime> for Runtime {
+	impl auditor_runtime_api::LogsRetrieval<Block, AccountId> for Runtime {
 		fn retrieve_paginated_audit_log(log_key: Vec<u8>, 
 			log_date: Vec<u8>, 
 			max_result_count: u32, 

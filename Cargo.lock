@@ -376,6 +376,7 @@ dependencies = [
  "auditor-pallet",
  "frame-support",
  "frame-system",
+ "parity-scale-codec",
  "sp-api",
 ]
 
