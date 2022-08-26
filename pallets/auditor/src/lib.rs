@@ -22,6 +22,7 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
     use scale_info::TypeInfo;
     use frame_support::inherent::Vec;
+    use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
@@ -67,6 +68,20 @@ pub mod pallet {
 
         pub fn get_reporter(self) -> T {
             self.reporter
+        }
+    }
+
+    impl <T> Serialize for AuditLog<T> {
+        fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+        S: Serializer,
+        {
+            let mut s = serializer.serialize_struct("AuditLog", 4)?;
+            s.serialize_field("title", &self.title)?;
+            s.serialize_field("content", &self.content)?;
+            s.serialize_field("timestamp", &self.timestamp)?;
+            s.serialize_field("reporter", &self.reporter)?;
+            s.end()
         }
     }
 

@@ -21,6 +21,10 @@ features = ['derive']
 package = 'parity-scale-codec'
 version = '2.0.0'
 
+[dependencies.serde]
+default-features = false
+version = '1.0.144'
+
 [dependencies.scale]
 default-features = false
 package = 'scale-info-derive'
