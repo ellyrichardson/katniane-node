@@ -101,7 +101,13 @@ where
             self.client.info().best_hash
         ));
 
-        let runtime_api_result = api.retrieve_paginated_audit_log(log_key.clone(), log_date.clone(), max_result_count.clone(), selected_page_num.clone());
+        let runtime_api_result = api.retrieve_paginated_audit_log(
+            &at,
+            log_key.clone(), 
+            log_date.clone(), 
+            max_result_count.clone(), 
+            selected_page_num.clone()
+        );
         runtime_api_result.map_err(|e| {
 			CallError::Custom(ErrorObject::owned(
 				Error::RuntimeError.into(),
