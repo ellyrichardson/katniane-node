@@ -25,6 +25,11 @@ version = '3.0.0'
 path = '../runtime'
 version = '3.0.0-monthly-2021-10'
 
+[dependencies.auditor-runtime-rpc]
+default-features = false
+path = '../pallets/auditor/rpc'
+version = '1.0.0'
+
 [dependencies]
 jsonrpc-core = '18.0.0'
 structopt = '0.3.8'

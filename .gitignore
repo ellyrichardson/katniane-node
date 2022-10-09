@@ -17,3 +17,4 @@
 
 # cargo lock
 Cargo.lock
+**/*Cargo.lock

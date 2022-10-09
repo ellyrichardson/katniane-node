@@ -279,4 +279,30 @@ impl<T: Config> Pallet<T> {
         // Remove the audit log as open for claiming so that is not open anymore (delete from the AuditLogOpenForClaimStorage)
         AuditLogOpenForClaimStorage::<T>::remove(log_file_name);
 	}
+
+    pub fn retrieve_paginated_audit_logs(log_key: Vec<u8>, log_date: Vec<u8>, max_result_count: u32, selected_page_num: u32) -> Vec<AuditLog<T::AccountId>> {
+        let audit_logs = <AuditLogStorage<T>>::get(&log_key, &log_date);
+
+        // Offset of logs is the measure of unneeded logs before the logs that are actually needed
+        let audit_log_offset = (&selected_page_num - 1) * &max_result_count;
+        // Limit of logs to be retrieved past the offset in the collection
+        let audit_log_limit = &audit_log_offset + &max_result_count;
+
+        // TODO: Find out why "pallet::AuditLog<<T as frame_system::Config>::AccountId>" works after Vec:: but not by itself
+        let mut paginated_audit_logs = Vec::<pallet::AuditLog<<T as frame_system::Config>::AccountId>>::new();
+        
+        // TODO: Handle if the limit is larger than the actual length of the vector
+
+        if selected_page_num <= 1 {
+            for i in 0..(max_result_count) {
+                paginated_audit_logs.push(audit_logs[i as usize].clone());
+            }
+        } else {
+            for i in audit_log_offset..audit_log_limit {
+                paginated_audit_logs.push(audit_logs[i as usize].clone());
+            }
+        }
+
+        paginated_audit_logs
+    }
 }
