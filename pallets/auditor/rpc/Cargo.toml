@@ -9,6 +9,9 @@ license = 'Unlicense'
 publish = false
 #repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
 
+[dependencies]
+parity-util-mem = '0.11.0'
+
 [dependencies.auditor-runtime-api]
 default-features = false
 path = '../runtime-api'
@@ -33,31 +36,32 @@ version = '0.15.1'
 [dependencies.sp-api]
 default-features = false
 git = 'https://github.com/paritytech/substrate.git'
-tag = 'monthly-2021-10'
+tag = 'monthly-2022-10'
 version = '4.0.0-dev'
 
 [dependencies.sp-blockchain]
 default-features = false
 git = 'https://github.com/paritytech/substrate.git'
-tag = 'monthly-2021-10'
+tag = 'monthly-2022-10'
 version = '4.0.0-dev'
 
 [dependencies.sp-core]
 default-features = false
 git = 'https://github.com/paritytech/substrate.git'
-tag = 'monthly-2021-10'
-version = '4.0.0-dev'
+tag = 'monthly-2022-10'
+version = '6.0.0-dev'
 
 [dependencies.sp-rpc]
 default-features = false
 git = 'https://github.com/paritytech/substrate.git'
-tag = 'monthly-2021-10'
-version = '4.0.0-dev'
+tag = 'monthly-2022-10'
+version = '6.0.0-dev'
 
 [dependencies.sp-runtime]
 default-features = false
 git = 'https://github.com/paritytech/substrate.git'
-tag = 'monthly-2021-10'
+tag = 'monthly-2022-10'
+version = '6.0.0-dev'
 
 [features]
 default = ['std']
