@@ -24,7 +24,10 @@ pub mod pallet {
     use frame_support::inherent::Vec;
     use serde::ser::{Serialize, SerializeStruct, Serializer};
     use core::convert::TryInto;
-    use scale_info::TypeInfo;
+    //use frame_support::parity_scale_codec::{WrapperTypeDecode, WrapperTypeEncode};
+    //use codec::{WrapperTypeDecode, WrapperTypeEncode};
+    use codec::{Encode, Decode, WrapperTypeDecode, WrapperTypeEncode};
+    //use scale_info::TypeInfo;
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
@@ -37,7 +40,8 @@ pub mod pallet {
 	#[pallet::generate_store(pub(super) trait Store)]
 	pub struct Pallet<T>(_);
 
-    #[derive(Encode, Decode, Clone, Default, Eq, PartialEq, Debug, TypeInfo)]
+    //#[derive(Encode, Decode, Clone, Default, Eq, PartialEq, Debug, TypeInfo)]
+    #[derive(Clone, Default, Eq, PartialEq, Debug)]
     pub struct AuditLog<AccountId> {
         // Change the timestamp to a timestamp type handled by Substrate itself
         // Reporter determines which system sent the log
@@ -47,7 +51,8 @@ pub mod pallet {
         reporter: AccountId,
     }
 
-    #[derive(Encode, Decode, Clone, Default, Eq, PartialEq, Debug, TypeInfo)]
+    // #[derive(Encode, Decode, Clone, Default, Eq, PartialEq, Debug, TypeInfo)]
+    #[derive(Clone, Default, Eq, PartialEq, Debug)]
     pub struct AuditLogOpenForClaim<AccountId> {
         filename: Vec<u8>,
         assigned_claimer: AccountId,
@@ -134,6 +139,7 @@ pub mod pallet {
 
     // Errors inform users that something went wrong.
 	#[pallet::error]
+    #[derive(WrapperTypeEncode, WrapperTypeDecode)]
 	pub enum Error<T> {
         AuditLogIdentifierCannotBeUsed,
         NoRightsToOpenAuditLogForClaiming,
