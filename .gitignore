@@ -16,4 +16,4 @@
 .direnv
 
 # cargo lock
-Cargo.lock
+**/*Cargo.lock
