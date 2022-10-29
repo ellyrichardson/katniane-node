@@ -1,6 +1,7 @@
 use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok};
 use codec::Encode;
+use frame_system::Origin;
 
 #[test]
 fn save_audit_log_one_item() {

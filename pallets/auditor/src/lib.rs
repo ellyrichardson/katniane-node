@@ -18,15 +18,15 @@ mod benchmarking;
 
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
+	use frame_support::{dispatch::{DispatchResult, Decode, Encode}, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
-    use scale_info::TypeInfo;
+    //use scale_info::TypeInfo;
     use frame_support::inherent::Vec;
     use serde::ser::{Serialize, SerializeStruct, Serializer};
     use core::convert::TryInto;
     //use frame_support::parity_scale_codec::{WrapperTypeDecode, WrapperTypeEncode};
     //use codec::{WrapperTypeDecode, WrapperTypeEncode};
-    use codec::{Encode, Decode, WrapperTypeDecode, WrapperTypeEncode};
+    //use codec::{Encode, Decode};
     //use scale_info::TypeInfo;
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
@@ -139,7 +139,7 @@ pub mod pallet {
 
     // Errors inform users that something went wrong.
 	#[pallet::error]
-    #[derive(WrapperTypeEncode, WrapperTypeDecode)]
+    //#[derive(codec::WrapperTypeEncode, codec::WrapperTypeDecode)]
 	pub enum Error<T> {
         AuditLogIdentifierCannotBeUsed,
         NoRightsToOpenAuditLogForClaiming,
